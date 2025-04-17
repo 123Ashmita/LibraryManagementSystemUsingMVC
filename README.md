@@ -2,8 +2,7 @@
 
 ## Overview
 
-The **Library Management System (LMS)** is a software application that helps in managing the operations of a library. The system follows the **Model-View-Controller (MVC)** design pattern. This system is used by both patrons and librarians to perform various actions like managing books, borrowing, and returning books, and managing patrons.<br><br>
-
+The **Library Management System (LMS)** is a software application that helps in managing the operations of a library. The system follows the **Model-View-Controller (MVC)** design pattern.
 ### Key Features:
 - **Add Books**: Librarians can add books to the library's collection.<br>
 - **View Books**: Librarians and patrons can view the list of available books.<br>

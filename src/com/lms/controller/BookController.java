@@ -12,7 +12,7 @@ public class BookController {
     }
 
     public void handleAddBook(Scanner sc) {
-    	bookService.handleAddBook(sc);
+    	bookService.addBook(sc);
     }
 
     public void listBooks() {
@@ -20,14 +20,14 @@ public class BookController {
     }
 
     public void handleBorrowBook(Scanner sc) {
-    	bookService.handleBorrowBook(sc);
+    	bookService.borrowBook(sc);
     }
 
     public void handleReturnBook(Scanner sc) {
-    	bookService.handleReturnBook(sc);
+    	bookService.returnBook(sc);
     }
 
     public void handleListBorrowedByPatron(Scanner sc) {
-    	bookService.handleListBorrowedByPatron(sc);
+    	bookService.showBorrowedBooks(sc);
     }
 }

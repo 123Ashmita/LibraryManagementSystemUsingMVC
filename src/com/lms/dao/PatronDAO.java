@@ -7,6 +7,7 @@ import java.sql.*;
 
 public class PatronDAO {
 
+    // Add a new patron
     public void addPatron(Patron patron) {
         String sql = "insert into patrons values (?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -15,13 +16,14 @@ public class PatronDAO {
             stmt.setInt(1, patron.getPid());
             stmt.setString(2, patron.getName());
             stmt.executeUpdate();
-            System.out.println("Patron added successfully!");
 
+            System.out.println("Patron added.");
         } catch (SQLException e) {
-            System.out.println("Error adding patron: " + e.getMessage());
+            System.out.println("Add patron error: " + e.getMessage());
         }
     }
 
+    // Get all patrons
     public Patron[] getAllPatrons() {
         Patron[] patrons = new Patron[100];
         int index = 0;
@@ -37,9 +39,8 @@ public class PatronDAO {
                         rs.getString("name")
                 );
             }
-
         } catch (SQLException e) {
-            System.out.println("Error fetching patrons: " + e.getMessage());
+            System.out.println("Fetch patrons error: " + e.getMessage());
         }
 
         Patron[] result = new Patron[index];
@@ -47,6 +48,7 @@ public class PatronDAO {
         return result;
     }
 
+    // Get a single patron by ID
     public Patron getPatronById(int id) {
         String sql = "select * from patrons where patron_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -58,36 +60,35 @@ public class PatronDAO {
             if (rs.next()) {
                 return new Patron(rs.getInt("patron_id"), rs.getString("name"));
             }
-
         } catch (SQLException e) {
-            System.out.println("Error retrieving patron: " + e.getMessage());
+            System.out.println("Get patron error: " + e.getMessage());
         }
 
         return null;
     }
 
+    // Delete a patron (only if they haven't borrowed books)
     public boolean deletePatron(int patronId) {
-        String checkBorrowed = "select * from borrowed_books where patron_id = ?";
+        String check = "select * from borrowed_books where patron_id = ?";
         String delete = "delete from patrons where patron_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement checkStmt = conn.prepareStatement(checkBorrowed)) {
+             PreparedStatement checkStmt = conn.prepareStatement(check)) {
 
             checkStmt.setInt(1, patronId);
             ResultSet rs = checkStmt.executeQuery();
 
             if (rs.next()) {
-                return false;
+                return false; // Patron has borrowed books
             }
 
             try (PreparedStatement deleteStmt = conn.prepareStatement(delete)) {
                 deleteStmt.setInt(1, patronId);
-                int rows = deleteStmt.executeUpdate();
-                return rows > 0;
+                return deleteStmt.executeUpdate() > 0;
             }
 
         } catch (SQLException e) {
-            System.out.println("Error deleting patron: " + e.getMessage());
+            System.out.println("Delete patron error: " + e.getMessage());
             return false;
         }
     }

@@ -12,7 +12,7 @@ public class PatronController {
     }
 
     public void handleAddPatron(Scanner sc) {
-    	patronService.handleAddPatron(sc);
+    	patronService.addPatron(sc);;
     }
 
     public void listPatrons() {
@@ -20,7 +20,7 @@ public class PatronController {
     }
 
     public void deletePatron(Scanner sc) {
-        patronService.handleDeletePatron(sc);
+        patronService.deletePatron(sc);
     }
 
 }

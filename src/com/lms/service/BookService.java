@@ -8,133 +8,98 @@ import com.lms.entity.Patron;
 import java.util.Scanner;
 
 public class BookService {
-    private final BookDAO bookDAO;
-    private final PatronDAO patronDAO;
+    private BookDAO bookDAO = new BookDAO();
+    private PatronDAO patronDAO = new PatronDAO();
 
-    public BookService() {
-        this.bookDAO = new BookDAO();
-        this.patronDAO = new PatronDAO(); 
-    }
+    // Add a new book
+    public void addBook(Scanner sc) {
+        System.out.print("Enter Book ID: ");
+        int id = sc.nextInt();
+        sc.nextLine(); // Clear newline
+        System.out.print("Enter Title: ");
+        String title = sc.nextLine();
+        System.out.print("Enter Author: ");
+        String author = sc.nextLine();
 
-    public void addBook(Book book) {
+        Book book = new Book(id, title, author, true);
         bookDAO.addBook(book);
+        System.out.println("Book added.");
     }
 
-    public Book[] listBooks() {
+    // Show all books
+    public void listBooks() {
         Book[] books = bookDAO.getAllBooks();
-        System.out.println("--------Book List -------");
+        System.out.println("---- Book List ----");
         for (Book book : books) {
             book.printBooks();
         }
-        return books;
     }
 
-    public boolean borrowBook(int patronId, int bookId) {
-        Patron patron = patronDAO.getPatronById(patronId);
-        if (patron == null) {
-            System.out.println("Patron not found or does not exist.");
-            return false;
-        }
+    // Borrow a book
+    public void borrowBook(Scanner sc) {
+        System.out.print("Enter Patron ID: ");
+        int patronId = sc.nextInt();
+        System.out.print("Enter Book ID: ");
+        int bookId = sc.nextInt();
 
         Book book = bookDAO.getBookById(bookId);
-        if (book == null) {
-            System.out.println("Book not found or does not exist.");
-            return false;
+        Patron patron = patronDAO.getPatronById(patronId);
+
+        if (book == null || patron == null) {
+            System.out.println("Invalid book or patron.");
+            return;
         }
 
         if (!book.isAvailable()) {
-            System.out.println("Book is already borrowed by someone else.");
-            return false;
+            System.out.println("Book is already borrowed.");
+            return;
         }
 
         bookDAO.borrowBook(patronId, bookId);
         book.setAvailable(false);
-        return true;
+        System.out.println("Book borrowed.");
     }
 
-    public boolean returnBook(int patronId, int bookId) {
-        Patron patron = patronDAO.getPatronById(patronId); 
-        if (patron == null) {
-            System.out.println("Patron not found or does not exist.");
-            return false;
-        }
+    // Return a book
+    public void returnBook(Scanner sc) {
+        System.out.print("Enter Patron ID: ");
+        int patronId = sc.nextInt();
+        System.out.print("Enter Book ID: ");
+        int bookId = sc.nextInt();
 
         Book book = bookDAO.getBookById(bookId);
-        if (book == null) {
-            System.out.println("Book not found or does not exist.");
-            return false;
+        Patron patron = patronDAO.getPatronById(patronId);
+
+        if (book == null || patron == null) {
+            System.out.println("Invalid book or patron.");
+            return;
         }
 
         if (book.isAvailable()) {
-            System.out.println("Book is not currently borrowed.");
-            return false;
+            System.out.println("Book was not borrowed.");
+            return;
         }
 
         bookDAO.returnBook(patronId, bookId);
         book.setAvailable(true);
-        return true;
+        System.out.println("Book returned.");
     }
 
-    public Book[] getBorrowedBooksByPatron(int patronId) {
+    // Show books borrowed by a patron
+    public void showBorrowedBooks(Scanner sc) {
+        System.out.print("Enter Patron ID: ");
+        int patronId = sc.nextInt();
+
         Patron patron = patronDAO.getPatronById(patronId);
         if (patron == null) {
-            System.out.println("OOPS! Patron does not exist.");
-            return new Book[0];
-        }
-
-        Book[] books = bookDAO.getBorrowedBooksByPatron(patronId);
-        for (Book book : books) {
-            book.printBooks();
-        }
-        return books;
-    }
-    public void handleAddBook(Scanner sc) {
-        System.out.print("Enter Book ID: ");
-        int bookId = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Enter Book Title: ");
-        String title = sc.nextLine();
-        System.out.print("Enter Book Author: ");
-        String author = sc.nextLine();
-
-        if (title.trim().isEmpty() || author.trim().isEmpty()) {
-            System.out.println("Title/Author can't be empty.");
+            System.out.println("Patron not found.");
             return;
         }
 
-        Book book = new Book(bookId, title.trim(), author.trim(), true);
-        addBook(book);
-    }
-
-    public void handleBorrowBook(Scanner sc) {
-        System.out.print("Enter Patron ID: ");
-        int patronId = sc.nextInt();
-        System.out.print("Enter Book ID: ");
-        int bookId = sc.nextInt();
-
-        if (borrowBook(patronId, bookId)) {
-            System.out.println("Book borrowed successfully.");
-        } else {
-            System.out.println("Failed to borrow book.");
+        Book[] books = bookDAO.getBorrowedBooksByPatron(patronId);
+        System.out.println("Borrowed Books:");
+        for (Book book : books) {
+            book.printBooks();
         }
-    }
-
-    public void handleReturnBook(Scanner sc) {
-        System.out.print("Enter Patron ID: ");
-        int patronId = sc.nextInt();
-        System.out.print("Enter Book ID: ");
-        int bookId = sc.nextInt();
-
-        if (returnBook(patronId, bookId)) {
-            System.out.println("Book returned successfully.");
-        } else {
-            System.out.println("Return failed.");
-        }
-    }
-
-    public void handleListBorrowedByPatron(Scanner sc) {
-        System.out.print("Enter Patron ID: ");
-        int patronId = sc.nextInt();
-        getBorrowedBooksByPatron(patronId);
     }
 }
